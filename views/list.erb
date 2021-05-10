@@ -1,0 +1,23 @@
+<h1 class="title is-1"><%= list_name %></h1>
+
+<div class="subtitle">Count: <%= count %></div>
+
+<% for entity in entities %>
+  <div>
+    <a href="/<%= list_name %>/<%= entity['_id'] %>"><%= entity['title'] %></a>
+    <% if entity['tags'] %>
+      <% for tag in entity['tags'] %>
+        <span class="tag is-primary is-light"><%= tag %></span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<nav class="pagination" role="navigation" aria-label="pagination">
+  <% if (offset + limit) < count %>
+    <a class="pagination-next" href="/<%= list_name %>?offset=<%= offset + limit %>">Next</a>
+  <% end %>
+  <% if (offset - limit) >= 0 %>
+    <a class="pagination-previous" href="/<%= list_name %>?offset=<%= offset - limit %>">Prev</a>
+  <% end %>
+</nav>
