@@ -2,6 +2,21 @@
 
 <div class="subtitle">Count: <%= count %></div>
 
+<% if filters.count > 0 %>
+  <h2 class="subtitle">Filters</h2>
+  <% for name, list in filters %>
+    <div>
+      <%= name %> :
+      <% for filter in list %>
+        <a href="/<%= list_name %>?<%= name %>=<%= filter['_id'] %>"><%= filter['_id'] %></a>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<br />
+<h2 class="subtitle">Result</h2>
+<br />
 <% for entity in entities %>
   <div>
     <a href="/<%= list_name %>/<%= entity['_id'] %>"><%= entity['title'] %></a>

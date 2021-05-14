@@ -32,15 +32,28 @@ end
 get '/upworks' do
   limit = 20
   offset = params[:offset].to_i || 0
-  result = upworks_collection.find({}, sort: {created_at: -1}).skip(offset).limit(limit)
-  count = upworks_collection.count
+
+  filter = {}
+
+  filter["parsed.#{params[:budget]}"] = { '$exists' => true } if params[:budget]
+  filter['parsed.Country'] = params[:countries] if params[:countries]
+
+  result = upworks_collection.find(filter, sort: {created_at: -1}).skip(offset).limit(limit)
+  count = upworks_collection.find(filter).count
   
   countries = upworks_collection.aggregate([
     { '$match' => { 'parsed' => { '$exists' => true }}},
     { '$group' => { '_id' => '$parsed.Country'}}
   ])
+  budget = [{'_id' => 'Budget'}, {'_id' => 'Hourly Range'}]
   erb :list, layout: :main, locals: {
-    entities: result, count: count, offset: offset, limit: limit, list_name: 'upworks' }
+    entities: result,
+    count: count,
+    offset: offset,
+    limit: limit,
+    list_name: 'upworks',
+    filters: { countries: countries, budget: budget }
+  }
 end
 
 get '/upworks/:id' do |id|
