@@ -21,7 +21,13 @@ get '/exits' do
   result = exits_collection.find({}, sort: {created_at: -1}).skip(offset).limit(limit)
   count = exits_collection.count
   erb :list, layout: :main, locals: {
-    entities: result, count: count, offset: offset, limit: limit, list_name: 'exits' }
+    entities: result,
+    count: count,
+    offset: offset,
+    limit: limit,
+    list_name: 'exits',
+    filters: {}
+  }
 end
 
 get '/exits/:id' do |id|
@@ -36,6 +42,9 @@ get '/upworks' do
   filter = {}
 
   filter["parsed.#{params[:budget]}"] = { '$exists' => true } if params[:budget]
+  pp params[:budget_more]
+  filter["parsed.Budget.value"] = { '$gt' => params[:budget_more].to_i } if params[:budget_more]
+  filter["parsed.Hourly Range.to"] = { '$gt' => params[:hourly_range_more].to_i } if params[:hourly_range_more]
   filter['parsed.Country'] = params[:countries] if params[:countries]
 
   result = upworks_collection.find(filter, sort: {created_at: -1}).skip(offset).limit(limit)
@@ -46,13 +55,15 @@ get '/upworks' do
     { '$group' => { '_id' => '$parsed.Country'}}
   ])
   budget = [{'_id' => 'Budget'}, {'_id' => 'Hourly Range'}]
+  budget_more = [{'_id' => 999 }, {'_id' => 1999 }, {'_id' => 2999 }]
+  hourly_range_more = [{'_id' => 19 }, {'_id' => 29 }, {'_id' => 39 }, {'_id' => 49 }, {'_id' => 59 }]
   erb :list, layout: :main, locals: {
     entities: result,
     count: count,
     offset: offset,
     limit: limit,
     list_name: 'upworks',
-    filters: { countries: countries, budget: budget }
+    filters: { countries: countries, budget: budget, budget_more: budget_more, hourly_range_more: hourly_range_more }
   }
 end
 
